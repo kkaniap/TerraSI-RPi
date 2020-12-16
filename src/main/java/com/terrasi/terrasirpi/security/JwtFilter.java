@@ -23,7 +23,7 @@ import java.util.Set;
 public class JwtFilter extends BasicAuthenticationFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JwtFilter.class);
-    
+
     public JwtFilter(AuthenticationManager authenticationManager){
         super(authenticationManager);
     }
