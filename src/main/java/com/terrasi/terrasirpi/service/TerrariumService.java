@@ -22,13 +22,13 @@ public class TerrariumService {
         this.usbUtils = usbUtils;
     }
 
-    @RabbitListener(queues = "Raspberry_kkaniap_Terrarium_test")
-    public void getTerrariumSettings(Message message) {
-        try {
-            TerrariumSettings terrariumSettings = objectMapper.readValue(message.getBody(), TerrariumSettings.class);
-            usbUtils.sendData(terrariumSettings);
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-        }
-    }
+//    @RabbitListener(queues = "Raspberry_kkaniap_Terrarium_test")
+//    public void getTerrariumSettings(Message message) {
+//        try {
+//            TerrariumSettings terrariumSettings = objectMapper.readValue(message.getBody(), TerrariumSettings.class);
+//            usbUtils.sendData(terrariumSettings);
+//        } catch (Exception e) {
+//            LOG.error(e.getMessage());
+//        }
+//    }
 }

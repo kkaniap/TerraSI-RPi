@@ -1,34 +1,35 @@
 package com.terrasi.terrasirpi.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fazecast.jSerialComm.SerialPort;
-import com.terrasi.terrasirpi.model.TerrariumSettings;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fazecast.jSerialComm.SerialPortDataListener;
+import com.fazecast.jSerialComm.SerialPortEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 
 
 @Component
-public class UsbUtils {
+public class UsbUtils implements SerialPortDataListener {
 
     private static UsbUtils INSTANCE;
+    private static String RPI_PORT;
     private static SerialPort serialPort;
     private final ObjectMapper objectMapper;
+    private String receivedData = "";
 
     private UsbUtils() {
-        serialPort = SerialPort.getCommPort("ttyACM0");
-        //serialPort = SerialPort.getCommPort("COM2");
-        serialPort.setComPortParameters(9600, 8, 1, 0);
+        //serialPort = SerialPort.getCommPort("ttyACM0");
+        serialPort = SerialPort.getCommPort("COM3");
+        serialPort.setComPortParameters(115200, 8, 1, 0);
         serialPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+        serialPort.addDataListener(this);
+        serialPort.setFlowControl(SerialPort.FLOW_CONTROL_RTS_ENABLED);
         serialPort.openPort();
         this.objectMapper = new ObjectMapper();
     }
 
-    private static String RPI_PORT;
 
     @Value("${rpi.usb.port}")
     private void setRpiPort(String port) {
@@ -42,22 +43,45 @@ public class UsbUtils {
         return INSTANCE;
     }
 
-    public void sendData(TerrariumSettings terrariumSettings) throws InterruptedException, IOException {
-        System.out.println(terrariumSettings);
-        try{
+    public void sendData(Object terrariumSettings) throws InterruptedException, IOException {
+        try {
             if (serialPort.isOpen()) {
-                serialPort.getOutputStream().write(objectMapper.writeValueAsString(terrariumSettings)
-                        .replaceAll("\"","\\\"")
-                        .replaceAll("false", "0")
-                        .replaceAll("true", "1")
-                        .getBytes());
-
+//                serialPort.getOutputStream().write(objectMapper.writeValueAsString(terrariumSettings)
+//                        .replaceAll("\"","\\\"")
+//                        .replaceAll("false", "0")
+//                        .replaceAll("true", "1")
+//                        .getBytes());
+                serialPort.getOutputStream().write("kania".getBytes());
                 serialPort.getOutputStream().flush();
+                serialPort.getOutputStream().close();
             }
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.print(e.getMessage());
+        }
+    }
+
+    @Override
+    public int getListeningEvents() {
+        return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
+    }
+
+    @Override
+    public void serialEvent(SerialPortEvent serialPortEvent) {
+        if (serialPortEvent.getEventType() != SerialPort.LISTENING_EVENT_DATA_RECEIVED) {
+            return;
         }
 
+        byte[] buffer = serialPortEvent.getReceivedData();
+        receivedData += new String(buffer);
 
+        if (receivedData.contains("\n")) {
+            receivedData = "";
+        }
+
+        try {
+            sendData("kania");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
