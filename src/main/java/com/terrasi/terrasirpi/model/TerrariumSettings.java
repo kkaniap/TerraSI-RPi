@@ -7,17 +7,19 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 @ToString
 @Data
-public class TerrariumSettings {
+public class TerrariumSettings implements Serializable {
 
     private Long id;
     private Integer lightPower;
     private Integer humidityLevel;
     private Integer sunSpeed;
     private Boolean isBulbWorking;
+    private Boolean isHumidifierWorking;
     private Boolean autoManagement;
 
     @JsonDeserialize(using = LocalTimeDeserializer.class)

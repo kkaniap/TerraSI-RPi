@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -21,16 +22,22 @@ public class TerrariumController {
     }
 
     @PostMapping("/settings")
-    public ResponseEntity<String> setTerrariumSettings(@RequestBody TerrariumSettings settings){
+    public ResponseEntity<String> setTerrariumSettings(@RequestBody TerrariumSettings settings) throws IOException, InterruptedException {
         //send to arduino
         System.out.println(settings);
+        //usbUtils.sendData("bulbPower=" + settings.getLightPower());
         return new ResponseEntity<>("sd", HttpStatus.OK);
     }
 
     @PostMapping("/bulbOnOf")
-    public ResponseEntity<String> turnBulbOnOf(@RequestBody Map<String, Boolean> param){
-        //send to arduino
-        System.out.println(param);
+    public ResponseEntity<String> turnBulbOnOf(@RequestBody Map<String, String> data) throws IOException, InterruptedException {
+        return null;
+    }
+
+    @PostMapping("/humidifierOnOff")
+    public ResponseEntity<String> turnHumidifierOnOff(@RequestBody Map<String, String> data) throws IOException, InterruptedException {
+        System.out.println(data);
+        //usbUtils.sendData("humidifier=" + data.get("humidifier"));
         return null;
     }
 }
