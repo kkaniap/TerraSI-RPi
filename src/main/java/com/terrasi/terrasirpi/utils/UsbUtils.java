@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
+import com.terrasi.terrasirpi.model.TerrariumSettings;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
-
-@Component
 public class UsbUtils implements SerialPortDataListener {
 
     private static UsbUtils INSTANCE;
@@ -20,8 +16,8 @@ public class UsbUtils implements SerialPortDataListener {
     private String receivedData = "";
 
     private UsbUtils() {
-        //serialPort = SerialPort.getCommPort("ttyACM0");
-        serialPort = SerialPort.getCommPort("COM3");
+        serialPort = SerialPort.getCommPort("ttyACM0");
+        //serialPort = SerialPort.getCommPort("COM3");
         serialPort.setComPortParameters(115200, 8, 1, 0);
         serialPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
         serialPort.addDataListener(this);
@@ -43,15 +39,14 @@ public class UsbUtils implements SerialPortDataListener {
         return INSTANCE;
     }
 
-    public void sendData(Object terrariumSettings) throws InterruptedException, IOException {
+    public void sendData(TerrariumSettings terrariumSettings) {
         try {
             if (serialPort.isOpen()) {
-//                serialPort.getOutputStream().write(objectMapper.writeValueAsString(terrariumSettings)
-//                        .replaceAll("\"","\\\"")
-//                        .replaceAll("false", "0")
-//                        .replaceAll("true", "1")
-//                        .getBytes());
-                serialPort.getOutputStream().write("kania".getBytes());
+                serialPort.getOutputStream().write(objectMapper.writeValueAsString(terrariumSettings)
+                        .replaceAll("\"", "\\\"")
+                        .replaceAll("false", "0")
+                        .replaceAll("true", "1")
+                        .getBytes());
                 serialPort.getOutputStream().flush();
                 serialPort.getOutputStream().close();
             }
@@ -75,13 +70,8 @@ public class UsbUtils implements SerialPortDataListener {
         receivedData += new String(buffer);
 
         if (receivedData.contains("\n")) {
+            System.out.print(receivedData);
             receivedData = "";
-        }
-
-        try {
-            sendData("kania");
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }
