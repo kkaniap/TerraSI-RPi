@@ -5,12 +5,10 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
-import org.springframework.beans.factory.annotation.Value;
 
 public class UsbUtils implements SerialPortDataListener {
 
     private static UsbUtils INSTANCE;
-    private static String RPI_PORT;
     private static SerialPort serialPort;
     private final ObjectMapper objectMapper;
     private String receivedData = "";
@@ -26,12 +24,6 @@ public class UsbUtils implements SerialPortDataListener {
         this.objectMapper = new ObjectMapper();
     }
 
-
-    @Value("${rpi.usb.port}")
-    private void setRpiPort(String port) {
-        UsbUtils.RPI_PORT = port;
-    }
-
     public static UsbUtils getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new UsbUtils();
@@ -43,9 +35,6 @@ public class UsbUtils implements SerialPortDataListener {
         try {
             if (serialPort.isOpen()) {
                 serialPort.getOutputStream().write(objectMapper.writeValueAsString(terrariumSettings)
-                        .replaceAll("\"", "\\\"")
-                        .replaceAll("false", "0")
-                        .replaceAll("true", "1")
                         .getBytes());
                 serialPort.getOutputStream().flush();
                 serialPort.getOutputStream().close();

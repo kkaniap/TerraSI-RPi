@@ -10,6 +10,7 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.Objects;
 
 @ToString
 @Data
@@ -40,4 +41,17 @@ public class TerrariumSettings implements Serializable {
     @JsonSerialize(using = LocalTimeSerializer.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalTime sunsetTime;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TerrariumSettings that = (TerrariumSettings) o;
+        return lightPower.equals(that.lightPower) && humidityLevel.equals(that.humidityLevel) && waterLevel.equals(that.waterLevel) && sunSpeed.equals(that.sunSpeed) && isBulbWorking.equals(that.isBulbWorking) && isHumidifierWorking.equals(that.isHumidifierWorking) && autoManagement.equals(that.autoManagement) && sunriseTime.equals(that.sunriseTime) && sunsetTime.equals(that.sunsetTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lightPower, humidityLevel, waterLevel, sunSpeed, isBulbWorking, isHumidifierWorking, autoManagement, sunriseTime, sunsetTime);
+    }
 }
