@@ -8,16 +8,15 @@ import com.terrasi.terrasirpi.model.TerrariumSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.util.Objects;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class UsbUtils implements SerialPortDataListener {
 
+    private String receivedData = "";
     private static UsbUtils INSTANCE;
     private static SerialPort serialPort;
     private final ObjectMapper objectMapper;
-    private String receivedData = "";
     private static final Logger LOG = LoggerFactory.getLogger(UsbUtils.class);
 
     private UsbUtils() {
@@ -31,15 +30,14 @@ public class UsbUtils implements SerialPortDataListener {
     }
 
     private void setSerialPort() {
-        String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
-        String appConfigPath = rootPath + "application.properties";
-        Properties appProps = new Properties();
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("application.properties");
+        Properties prop = new Properties();
         try {
-            appProps.load(new FileInputStream(appConfigPath));
+            prop.load(inputStream);
         } catch (Exception ex) {
             LOG.error(ex.getMessage());
         }
-        String port = appProps.getProperty("rpi.usb.port");
+        String port = prop.getProperty("rpi.usb.port");
         serialPort = SerialPort.getCommPort(port);
     }
 
