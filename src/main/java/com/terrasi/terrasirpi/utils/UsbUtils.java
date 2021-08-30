@@ -51,8 +51,9 @@ public class UsbUtils implements SerialPortDataListener {
     public void sendData(TerrariumSettings terrariumSettings) {
         try {
             if (serialPort.isOpen()) {
-                serialPort.getOutputStream().write(objectMapper.writeValueAsString(terrariumSettings)
-                        .getBytes());
+                serialPort.getOutputStream()
+                        .write(objectMapper.writeValueAsString(terrariumSettings)
+                                .getBytes());
                 serialPort.getOutputStream().flush();
                 serialPort.getOutputStream().close();
             }

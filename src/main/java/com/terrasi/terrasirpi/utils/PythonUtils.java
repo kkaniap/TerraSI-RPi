@@ -9,7 +9,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-
 public class PythonUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(PythonUtils.class);
@@ -35,6 +34,8 @@ public class PythonUtils {
                     .collect(Collectors.joining("\n"));
         }
 
+        deleteTempFile(file);
+
         return result;
     }
 
@@ -54,5 +55,9 @@ public class PythonUtils {
         }
 
         return tmpFile;
+    }
+
+    private static Boolean deleteTempFile(File file) {
+        return file.delete();
     }
 }

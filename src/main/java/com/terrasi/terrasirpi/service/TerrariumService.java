@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class TerrariumService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TerrariumService.class);
     private final ObjectMapper objectMapper;
     private static TerrariumSettings terrariumSettings;
+    private static final Logger LOG = LoggerFactory.getLogger(TerrariumService.class);
 
     public TerrariumService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
