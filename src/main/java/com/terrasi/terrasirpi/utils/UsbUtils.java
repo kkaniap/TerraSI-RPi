@@ -7,6 +7,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
+import com.terrasi.terrasirpi.service.TerrariumLogic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

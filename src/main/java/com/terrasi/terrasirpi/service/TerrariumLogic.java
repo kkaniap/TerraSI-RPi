@@ -1,8 +1,7 @@
-package com.terrasi.terrasirpi.utils;
+package com.terrasi.terrasirpi.service;
 
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
-import com.terrasi.terrasirpi.service.TerrariumService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 

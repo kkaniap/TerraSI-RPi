@@ -7,7 +7,6 @@ import com.terrasi.terrasirpi.enums.ScriptName;
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import com.terrasi.terrasirpi.utils.PythonUtils;
-import com.terrasi.terrasirpi.utils.TerrariumLogic;
 import com.terrasi.terrasirpi.utils.UsbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
