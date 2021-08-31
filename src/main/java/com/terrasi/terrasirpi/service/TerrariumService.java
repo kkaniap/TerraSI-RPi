@@ -4,14 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.terrasi.terrasirpi.enums.ScriptName;
+import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import com.terrasi.terrasirpi.utils.PythonUtils;
-import com.terrasi.terrasirpi.utils.TerrariumLogic;
 import com.terrasi.terrasirpi.utils.UsbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -20,14 +23,20 @@ import java.util.HashMap;
 public class TerrariumService {
 
     private final ObjectMapper objectMapper;
+    private final RabbitTemplate rabbitTemplate;
+    private final RabbitAdmin rabbitAdmin;
     private static TerrariumSettings terrariumSettings;
+    @Value("${terrasirpi.rabbitmq.sensorsQueue.name}")
+    private String sensorsQueueName;
     private static final Logger LOG = LoggerFactory.getLogger(TerrariumService.class);
 
-    public TerrariumService(ObjectMapper objectMapper) {
+    public TerrariumService(ObjectMapper objectMapper,RabbitTemplate rabbitTemplate) {
         this.objectMapper = objectMapper;
+        this.rabbitTemplate = rabbitTemplate;
+        this.rabbitAdmin = new RabbitAdmin(rabbitTemplate);
     }
 
-    @RabbitListener(queues = "Raspberry_kkaniap_Terrarium_test")
+    @RabbitListener(queues = "${terrasirpi.rabbitmq.settingQueue.name}")
     public void getTerrariumSettings(Message message) {
         TerrariumSettings receivedTerrariumSettings = null;
 
@@ -39,6 +48,15 @@ public class TerrariumService {
 
         if (receivedTerrariumSettings != null && !receivedTerrariumSettings.equals(terrariumSettings)) {
             setNewSettings(receivedTerrariumSettings);
+        }
+    }
+
+    public void sendSensorRead(SensorsReads sensorsReads){
+        rabbitAdmin.purgeQueue(sensorsQueueName);
+        try {
+            rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
+        } catch (JsonProcessingException e) {
+            LOG.error(e.getMessage());
         }
     }
 

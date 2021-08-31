@@ -1,6 +1,5 @@
 package com.terrasi.terrasirpi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SensorsReads {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
     private Double temperature;
     private Double humidity;
