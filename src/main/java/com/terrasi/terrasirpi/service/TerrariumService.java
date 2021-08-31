@@ -22,15 +22,15 @@ import java.util.HashMap;
 @Service
 public class TerrariumService {
 
-    private final ObjectMapper objectMapper;
-    private final RabbitTemplate rabbitTemplate;
-    private final RabbitAdmin rabbitAdmin;
-    private static TerrariumSettings terrariumSettings;
     @Value("${terrasirpi.rabbitmq.sensorsQueue.name}")
     private String sensorsQueueName;
+    private final RabbitAdmin rabbitAdmin;
+    private final ObjectMapper objectMapper;
+    private final RabbitTemplate rabbitTemplate;
+    private static TerrariumSettings terrariumSettings;
     private static final Logger LOG = LoggerFactory.getLogger(TerrariumService.class);
 
-    public TerrariumService(ObjectMapper objectMapper,RabbitTemplate rabbitTemplate) {
+    public TerrariumService(ObjectMapper objectMapper, RabbitTemplate rabbitTemplate) {
         this.objectMapper = objectMapper;
         this.rabbitTemplate = rabbitTemplate;
         this.rabbitAdmin = new RabbitAdmin(rabbitTemplate);
@@ -51,7 +51,7 @@ public class TerrariumService {
         }
     }
 
-    public void sendSensorRead(SensorsReads sensorsReads){
+    public void sendSensorRead(SensorsReads sensorsReads) {
         rabbitAdmin.purgeQueue(sensorsQueueName);
         try {
             rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
@@ -76,7 +76,6 @@ public class TerrariumService {
         terrariumSettings = newTerrariumSettings;
         sendDataToArduino(terrariumSettings);
         turnOnOffHumidifier(terrariumSettings);
-        System.out.println(readDTH());
     }
 
     public void sendDataToArduino(TerrariumSettings terrariumSettings) {
