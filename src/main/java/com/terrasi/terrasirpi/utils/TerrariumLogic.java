@@ -3,6 +3,8 @@ package com.terrasi.terrasirpi.utils;
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import com.terrasi.terrasirpi.service.TerrariumService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -13,20 +15,23 @@ import java.util.Map;
 public class TerrariumLogic {
 
     private final TerrariumService terrariumService;
-    private static final SensorsReads sensorsReads = new SensorsReads();
     private static TerrariumSettings terrariumSettings;
+    private static final SensorsReads sensorsReads = new SensorsReads();
 
     public TerrariumLogic(TerrariumService terrariumService) {
         this.terrariumService = terrariumService;
     }
 
     @Scheduled(fixedDelay = 60000)
-    private void sendSensorReads() {
+    private void executeLogic() {
         readSensors();
+        if(terrariumSettings != null && terrariumSettings.getAutoManagement()){
+            runAutoManagement();
+        }
         terrariumService.sendSensorRead(sensorsReads);
     }
 
-    public void readSensors() {
+    private void readSensors() {
         Map<String, Double> dthMap = terrariumService.readDTH();
         sensorsReads.setHumidity(dthMap.get("humidity"));
         sensorsReads.setTemperature(dthMap.get("temp"));
@@ -34,8 +39,28 @@ public class TerrariumLogic {
         sensorsReads.setReadDate(LocalDateTime.now());
     }
 
+    private void runAutoManagement(){
+        handleHumidity();
+        handleLight();
+    }
+
+    private void handleHumidity(){
+        if(sensorsReads.getHumidity() < terrariumSettings.getHumidityLevel()){
+            terrariumService.turnOnOffHumidifier(true);
+        }else if(sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()){
+            terrariumService.turnOnOffHumidifier(false);
+        }
+    }
+
+    private void handleLight(){
+
+    }
+
     public static void setWaterLevel(Integer waterLevel) {
         sensorsReads.setWaterLevel(waterLevel);
     }
 
+    public static void setSettings(TerrariumSettings settings){
+        terrariumSettings = settings;
+    }
 }

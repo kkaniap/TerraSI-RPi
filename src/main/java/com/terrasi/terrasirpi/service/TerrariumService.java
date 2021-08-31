@@ -7,6 +7,7 @@ import com.terrasi.terrasirpi.enums.ScriptName;
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import com.terrasi.terrasirpi.utils.PythonUtils;
+import com.terrasi.terrasirpi.utils.TerrariumLogic;
 import com.terrasi.terrasirpi.utils.UsbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,35 +48,31 @@ public class TerrariumService {
         }
 
         if (receivedTerrariumSettings != null && !receivedTerrariumSettings.equals(terrariumSettings)) {
-            setNewSettings(receivedTerrariumSettings);
+            handleNewSettings(receivedTerrariumSettings);
+            TerrariumLogic.setSettings(receivedTerrariumSettings);
+            terrariumSettings = receivedTerrariumSettings;
         }
     }
 
-    public void sendSensorRead(SensorsReads sensorsReads) {
-        rabbitAdmin.purgeQueue(sensorsQueueName);
-        try {
-            rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
-        } catch (JsonProcessingException e) {
-            LOG.error(e.getMessage());
-        }
-    }
-
-    private void setNewSettings(TerrariumSettings newTerrariumSettings) {
-        if (terrariumSettings == null) {
+    private void handleNewSettings(TerrariumSettings newTerrariumSettings) {
+        if (terrariumSettings == null && !newTerrariumSettings.getAutoManagement()) {
             firstRun(newTerrariumSettings);
-        } else if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
-            sendDataToArduino(newTerrariumSettings);
-        } else if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
-            turnOnOffHumidifier(newTerrariumSettings);
+        } else if (!newTerrariumSettings.getAutoManagement()) {
+            setSettings(newTerrariumSettings);
         }
-
-        terrariumSettings = newTerrariumSettings;
     }
 
     private void firstRun(TerrariumSettings newTerrariumSettings) {
-        terrariumSettings = newTerrariumSettings;
-        sendDataToArduino(terrariumSettings);
-        turnOnOffHumidifier(terrariumSettings);
+        sendDataToArduino(newTerrariumSettings);
+        turnOnOffHumidifier(newTerrariumSettings.getIsHumidifierWorking());
+    }
+
+    private void setSettings(TerrariumSettings newTerrariumSettings) {
+        if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
+            sendDataToArduino(newTerrariumSettings);
+        } else if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
+            turnOnOffHumidifier(newTerrariumSettings.getIsHumidifierWorking());
+        }
     }
 
     public void sendDataToArduino(TerrariumSettings terrariumSettings) {
@@ -83,8 +80,8 @@ public class TerrariumService {
         utils.sendData(terrariumSettings);
     }
 
-    public void turnOnOffHumidifier(TerrariumSettings terrariumSettings) {
-        if (terrariumSettings.getIsHumidifierWorking()) {
+    public void turnOnOffHumidifier(Boolean turnOn) {
+        if (turnOn) {
             PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOn));
         } else {
             PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOff));
@@ -102,6 +99,15 @@ public class TerrariumService {
         String result = PythonUtils.runScript(PythonUtils.getScript(ScriptName.ReadDTH));
         return deserializeJSON(result, new TypeReference<>() {
         });
+    }
+
+    public void sendSensorRead(SensorsReads sensorsReads) {
+        rabbitAdmin.purgeQueue(sensorsQueueName);
+        try {
+            rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
+        } catch (JsonProcessingException e) {
+            LOG.error(e.getMessage());
+        }
     }
 
     private <T> HashMap<String, T> deserializeJSON(String json, TypeReference<HashMap<String, T>> type) {
