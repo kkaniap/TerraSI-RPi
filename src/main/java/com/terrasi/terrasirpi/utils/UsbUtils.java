@@ -1,14 +1,18 @@
 package com.terrasi.terrasirpi.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
+import com.terrasi.terrasirpi.service.TerrariumService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class UsbUtils implements SerialPortDataListener {
@@ -58,7 +62,7 @@ public class UsbUtils implements SerialPortDataListener {
                 serialPort.getOutputStream().close();
             }
         } catch (Exception e) {
-            System.out.print(e.getMessage());
+            LOG.error(e.getMessage());
         }
     }
 
@@ -77,7 +81,14 @@ public class UsbUtils implements SerialPortDataListener {
         receivedData += new String(buffer);
 
         if (receivedData.contains("\n")) {
-            System.out.print(receivedData);
+            try {
+                HashMap<String, Integer> resultMap = this.objectMapper.readValue(receivedData, new TypeReference<>() {
+                });
+                TerrariumLogic.setWaterLevel(resultMap.get("waterLevel"));
+            } catch (JsonProcessingException e) {
+                LOG.error(e.getMessage());
+            }
+
             receivedData = "";
         }
     }

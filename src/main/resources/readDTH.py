@@ -23,13 +23,16 @@ try:
 except Exception as error_2:
     error = error_2.args[0]
 
-if temp1 == None: temp1 = 0.0
-if temp2 == None: temp2 = 0.0
-if humidity1 == None: humidity1 = 0.0
-if humidity2 == None: humidity2 = 0.0
+avgTemp = 0.0
+avgHumidity = 0.0
 
-avgTemp = (temp1 + temp2) / 2
-avgHumidity = (humidity1 + humidity2) / 2
+if temp1 != None and temp2 != None: avgTemp = (temp1 + temp2) / 2
+elif temp1 == None and temp2 != None: avgTemp = temp2
+elif temp1 != None and temp2 == None: avgTemp = temp1
+
+if humidity1 != None and humidity2 != None: avgHumidity = (humidity1 + humidity2) / 2
+elif humidity1 == None and humidity2 != None: avgHumidity = humidity2
+elif humidity1 != None and humidity2 == None: avgHumidity = humidity1
 
 print("{\"temp\":" + str(avgTemp) + ",\"humidity\":" + str(avgHumidity) + "}")
 

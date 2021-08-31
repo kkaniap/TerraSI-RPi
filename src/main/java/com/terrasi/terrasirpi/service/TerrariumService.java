@@ -1,15 +1,20 @@
 package com.terrasi.terrasirpi.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.terrasi.terrasirpi.enums.ScriptName;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import com.terrasi.terrasirpi.utils.PythonUtils;
+import com.terrasi.terrasirpi.utils.TerrariumLogic;
 import com.terrasi.terrasirpi.utils.UsbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 
 @Service
 public class TerrariumService {
@@ -53,9 +58,15 @@ public class TerrariumService {
         terrariumSettings = newTerrariumSettings;
         sendDataToArduino(terrariumSettings);
         turnOnOffHumidifier(terrariumSettings);
+        System.out.println(readDTH());
     }
 
-    private void turnOnOffHumidifier(TerrariumSettings terrariumSettings) {
+    public void sendDataToArduino(TerrariumSettings terrariumSettings) {
+        UsbUtils utils = UsbUtils.getInstance();
+        utils.sendData(terrariumSettings);
+    }
+
+    public void turnOnOffHumidifier(TerrariumSettings terrariumSettings) {
         if (terrariumSettings.getIsHumidifierWorking()) {
             PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOn));
         } else {
@@ -63,8 +74,26 @@ public class TerrariumService {
         }
     }
 
-    private void sendDataToArduino(TerrariumSettings terrariumSettings) {
-        UsbUtils utils = UsbUtils.getInstance();
-        utils.sendData(terrariumSettings);
+    public Boolean isTerrariumOpen() {
+        String result = PythonUtils.runScript(PythonUtils.getScript(ScriptName.IsOpen));
+        HashMap<String, Boolean> resultMap = deserializeJSON(result, new TypeReference<>() {
+        });
+        return resultMap.get("isOpen");
+    }
+
+    public HashMap<String, Double> readDTH() {
+        String result = PythonUtils.runScript(PythonUtils.getScript(ScriptName.ReadDTH));
+        return deserializeJSON(result, new TypeReference<>() {
+        });
+    }
+
+    private <T> HashMap<String, T> deserializeJSON(String json, TypeReference<HashMap<String, T>> type) {
+        HashMap<String, T> resultMap = new HashMap<>();
+        try {
+            resultMap = this.objectMapper.readValue(json, type);
+        } catch (JsonProcessingException e) {
+            LOG.error(e.getMessage());
+        }
+        return resultMap;
     }
 }
