@@ -3,8 +3,6 @@ package com.terrasi.terrasirpi.utils;
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import com.terrasi.terrasirpi.service.TerrariumService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +23,7 @@ public class TerrariumLogic {
     @Scheduled(fixedDelay = 60000)
     private void executeLogic() {
         readSensors();
-        if(terrariumSettings != null && terrariumSettings.getAutoManagement()){
+        if (terrariumSettings != null && terrariumSettings.getAutoManagement()) {
             runAutoManagement();
         }
         terrariumService.sendSensorRead(sensorsReads);
@@ -39,28 +37,28 @@ public class TerrariumLogic {
         sensorsReads.setReadDate(LocalDateTime.now());
     }
 
-    private void runAutoManagement(){
+    private void runAutoManagement() {
         handleHumidity();
         handleLight();
     }
 
-    private void handleHumidity(){
-        if(sensorsReads.getHumidity() < terrariumSettings.getHumidityLevel()){
+    private void handleHumidity() {
+        if (sensorsReads.getHumidity() < terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(true);
-        }else if(sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()){
+        } else if (sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(false);
         }
     }
 
-    private void handleLight(){
-
+    private void handleLight() {
+        //TODO
     }
 
     public static void setWaterLevel(Integer waterLevel) {
         sensorsReads.setWaterLevel(waterLevel);
     }
 
-    public static void setSettings(TerrariumSettings settings){
+    public static void setSettings(TerrariumSettings settings) {
         terrariumSettings = settings;
     }
 }
