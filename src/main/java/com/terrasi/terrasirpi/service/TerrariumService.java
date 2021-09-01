@@ -42,7 +42,8 @@ public class TerrariumService {
 
         try {
             receivedTerrariumSettings = this.objectMapper.readValue(message.getBody(), TerrariumSettings.class);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOG.error(e.getMessage());
         }
 
@@ -56,7 +57,8 @@ public class TerrariumService {
     private void handleNewSettings(TerrariumSettings newTerrariumSettings) {
         if (terrariumSettings == null && !newTerrariumSettings.getAutoManagement()) {
             firstRun(newTerrariumSettings);
-        } else if (!newTerrariumSettings.getAutoManagement()) {
+        }
+        else if (!newTerrariumSettings.getAutoManagement()) {
             setSettings(newTerrariumSettings);
         }
     }
@@ -69,7 +71,8 @@ public class TerrariumService {
     private void setSettings(TerrariumSettings newTerrariumSettings) {
         if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
             sendDataToArduino(newTerrariumSettings);
-        } else if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
+        }
+        else if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
             turnOnOffHumidifier(newTerrariumSettings.getIsHumidifierWorking());
         }
     }
@@ -82,7 +85,8 @@ public class TerrariumService {
     public void turnOnOffHumidifier(Boolean turnOn) {
         if (turnOn) {
             PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOn));
-        } else {
+        }
+        else {
             PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOff));
         }
     }
@@ -104,7 +108,8 @@ public class TerrariumService {
         rabbitAdmin.purgeQueue(sensorsQueueName);
         try {
             rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e) {
             LOG.error(e.getMessage());
         }
     }
@@ -113,7 +118,8 @@ public class TerrariumService {
         HashMap<String, T> resultMap = new HashMap<>();
         try {
             resultMap = this.objectMapper.readValue(json, type);
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e) {
             LOG.error(e.getMessage());
         }
         return resultMap;

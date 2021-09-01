@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
 
 @Service
@@ -44,13 +45,41 @@ public class TerrariumLogic {
     private void handleHumidity() {
         if (sensorsReads.getHumidity() < terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(true);
-        } else if (sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()) {
+            terrariumSettings.setIsHumidifierWorking(true);
+        }
+        else if (sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(false);
+            terrariumSettings.setIsHumidifierWorking(false);
         }
     }
 
     private void handleLight() {
-        //TODO
+        if (terrariumSettings.getSunSpeed() == 0
+                && terrariumSettings.getSunsetTime().getHour() <= LocalTime.now().getHour()
+                && terrariumSettings.getSunsetTime().getMinute() <= LocalTime.now().getMinute()) {
+            terrariumSettings.setLightPower(0);
+            terrariumService.sendDataToArduino(terrariumSettings);
+        }
+        else if(terrariumSettings.getSunSpeed() == 0
+                && terrariumSettings.getSunriseTime().getHour() <= LocalTime.now().getHour()
+                && terrariumSettings.getSunriseTime().getHour() <= LocalTime.now().getMinute()){
+            terrariumSettings.setLightPower(100);
+            terrariumService.sendDataToArduino(terrariumSettings);
+        }
+        else if (terrariumSettings.getSunSpeed() != 0
+                && terrariumSettings.getSunsetTime().getHour() <= LocalTime.now().getHour()
+                && terrariumSettings.getSunsetTime().getMinute() <= LocalTime.now().getMinute()){
+            terrariumSettings.setLightPower(terrariumSettings.getLightPower() - terrariumSettings.getSunSpeed());
+            terrariumService.sendDataToArduino(terrariumSettings);
+        }
+        else if(terrariumSettings.getSunSpeed() != 0
+                && terrariumSettings.getSunriseTime().getHour() <= LocalTime.now().getHour()
+                && terrariumSettings.getSunriseTime().getMinute() <= LocalTime.now().getMinute()){
+            terrariumSettings.setLightPower(terrariumSettings.getLightPower() + terrariumSettings.getSunSpeed());
+            terrariumService.sendDataToArduino(terrariumSettings);
+        }
+
+        terrariumSettings.setIsBulbWorking(terrariumSettings.getLightPower() != 0);
     }
 
     public static void setWaterLevel(Integer waterLevel) {
