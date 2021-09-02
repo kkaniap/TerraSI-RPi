@@ -21,7 +21,7 @@ public class TerrariumLogic {
     }
 
     @Scheduled(fixedDelay = 60000)
-    private void executeLogic() {
+    public void executeLogic() {
         readSensors();
         if (terrariumSettings != null && terrariumSettings.getAutoManagement()) {
             runAutoManagement();
@@ -55,30 +55,30 @@ public class TerrariumLogic {
 
     private void handleLight() {
         if (terrariumSettings.getSunSpeed() == 0
-                && terrariumSettings.getSunsetTime().getHour() <= LocalTime.now().getHour()
-                && terrariumSettings.getSunsetTime().getMinute() <= LocalTime.now().getMinute()) {
+                && terrariumSettings.getSunsetTime().isAfter(LocalTime.now())
+                && terrariumSettings.getSunriseTime().isBefore(LocalTime.now())) {
             terrariumSettings.setLightPower(0);
             terrariumService.sendDataToArduino(terrariumSettings);
         }
         else if(terrariumSettings.getSunSpeed() == 0
-                && terrariumSettings.getSunriseTime().getHour() <= LocalTime.now().getHour()
-                && terrariumSettings.getSunriseTime().getHour() <= LocalTime.now().getMinute()){
+                && terrariumSettings.getSunriseTime().isAfter(LocalTime.now())
+                && terrariumSettings.getSunsetTime().isBefore(LocalTime.now())){
             terrariumSettings.setLightPower(100);
             terrariumService.sendDataToArduino(terrariumSettings);
         }
         else if (terrariumSettings.getSunSpeed() != 0
-                && terrariumSettings.getSunsetTime().getHour() <= LocalTime.now().getHour()
-                && terrariumSettings.getSunsetTime().getMinute() <= LocalTime.now().getMinute()){
-            terrariumSettings.setLightPower(terrariumSettings.getLightPower() - terrariumSettings.getSunSpeed());
+                && terrariumSettings.getSunsetTime().isAfter(LocalTime.now())
+                && terrariumSettings.getSunriseTime().isBefore(LocalTime.now())){
+            terrariumSettings.setLightPower(Math.max((terrariumSettings.getLightPower() - terrariumSettings.getSunSpeed()), 0));
             terrariumService.sendDataToArduino(terrariumSettings);
         }
         else if(terrariumSettings.getSunSpeed() != 0
-                && terrariumSettings.getSunriseTime().getHour() <= LocalTime.now().getHour()
-                && terrariumSettings.getSunriseTime().getMinute() <= LocalTime.now().getMinute()){
-            terrariumSettings.setLightPower(terrariumSettings.getLightPower() + terrariumSettings.getSunSpeed());
+                && terrariumSettings.getSunriseTime().isAfter(LocalTime.now())
+                && terrariumSettings.getSunsetTime().isBefore(LocalTime.now())){
+            terrariumSettings.setLightPower(Math.min((terrariumSettings.getLightPower() + terrariumSettings.getSunSpeed()), 100));
             terrariumService.sendDataToArduino(terrariumSettings);
         }
-
+         LocalTime test = LocalTime.now();
         terrariumSettings.setIsBulbWorking(terrariumSettings.getLightPower() != 0);
     }
 
@@ -88,5 +88,9 @@ public class TerrariumLogic {
 
     public static void setSettings(TerrariumSettings settings) {
         terrariumSettings = settings;
+    }
+
+    public static SensorsReads getSensorsReads(){
+        return sensorsReads;
     }
 }

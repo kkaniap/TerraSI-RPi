@@ -22,8 +22,6 @@ public class TerrariumSettings implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer humidityLevel;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Integer waterLevel;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer sunSpeed;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Boolean isBulbWorking;
@@ -47,11 +45,11 @@ public class TerrariumSettings implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TerrariumSettings that = (TerrariumSettings) o;
-        return lightPower.equals(that.lightPower) && humidityLevel.equals(that.humidityLevel) && waterLevel.equals(that.waterLevel) && sunSpeed.equals(that.sunSpeed) && isBulbWorking.equals(that.isBulbWorking) && isHumidifierWorking.equals(that.isHumidifierWorking) && autoManagement.equals(that.autoManagement) && sunriseTime.equals(that.sunriseTime) && sunsetTime.equals(that.sunsetTime);
+        return lightPower.equals(that.lightPower) && humidityLevel.equals(that.humidityLevel) && sunSpeed.equals(that.sunSpeed) && isBulbWorking.equals(that.isBulbWorking) && isHumidifierWorking.equals(that.isHumidifierWorking) && autoManagement.equals(that.autoManagement) && sunriseTime.equals(that.sunriseTime) && sunsetTime.equals(that.sunsetTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lightPower, humidityLevel, waterLevel, sunSpeed, isBulbWorking, isHumidifierWorking, autoManagement, sunriseTime, sunsetTime);
+        return Objects.hash(lightPower, humidityLevel, sunSpeed, isBulbWorking, isHumidifierWorking, autoManagement, sunriseTime, sunsetTime);
     }
 }
