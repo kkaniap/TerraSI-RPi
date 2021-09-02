@@ -2,10 +2,10 @@ package com.terrasi.terrasirpi.service;
 
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -14,22 +14,19 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class TerrariumLogicTest {
 
-//    @Mock
-//    TerrariumService terrariumService;
-//
-//    @InjectMocks
-//    TerrariumLogic terrariumLogic;
+    @Mock
+    TerrariumService terrariumService;
+
+    @InjectMocks
+    TerrariumLogic terrariumLogic;
 
     @Test
     void shouldExecuteLogic() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
         given(terrariumService.readDTH()).willReturn(prepareDTHData());
 
@@ -45,10 +42,8 @@ class TerrariumLogicTest {
     }
 
     @Test
-    void shouldExecuteLogicWithToLowHumidity(){
+    void shouldExecuteLogicWithToLowHumidity() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
         given(terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
@@ -63,10 +58,8 @@ class TerrariumLogicTest {
     }
 
     @Test
-    void shouldExecuteLogicWithToHighHumidity(){
+    void shouldExecuteLogicWithToHighHumidity() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         HashMap<String, Double> dthReads = prepareDTHData();
         dthReads.replace("humidity", 80.0);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
@@ -84,10 +77,8 @@ class TerrariumLogicTest {
     }
 
     @Test
-    void shouldExecuteLogicSunrise(){
+    void shouldExecuteLogicSunrise() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
         given(terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
@@ -106,10 +97,8 @@ class TerrariumLogicTest {
     }
 
     @Test
-    void shouldExecuteLogicSunriseWithoutSunSpeed(){
+    void shouldExecuteLogicSunriseWithoutSunSpeed() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
         given(terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
@@ -128,10 +117,8 @@ class TerrariumLogicTest {
     }
 
     @Test
-    void shouldExecuteLogicSunset(){
+    void shouldExecuteLogicSunset() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
         given(terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
@@ -150,10 +137,8 @@ class TerrariumLogicTest {
     }
 
     @Test
-    void shouldExecuteLogicSunsetWithoutSunSpeed(){
+    void shouldExecuteLogicSunsetWithoutSunSpeed() {
         //given
-        TerrariumService terrariumService = mock(TerrariumService.class);
-        TerrariumLogic terrariumLogic = new TerrariumLogic(terrariumService);
         given(terrariumService.isTerrariumOpen()).willReturn(true);
         given(terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
@@ -171,14 +156,23 @@ class TerrariumLogicTest {
         assertEquals(0, terrariumSettings.getLightPower());
     }
 
-    private HashMap<String, Double> prepareDTHData(){
+    @Test
+    void shouldSetTerrariumSettings() {
+        //given
+        TerrariumLogic.setWaterLevel(50);
+
+        //then
+        assertEquals(50, TerrariumLogic.getSensorsReads().getWaterLevel());
+    }
+
+    private HashMap<String, Double> prepareDTHData() {
         HashMap<String, Double> dthMap = new HashMap<>();
         dthMap.put("humidity", 20.0);
         dthMap.put("temp", 20.0);
         return dthMap;
     }
 
-    private TerrariumSettings prepareTerrariumSetting(){
+    private TerrariumSettings prepareTerrariumSetting() {
         TerrariumSettings terrariumSettings = new TerrariumSettings();
         terrariumSettings.setLightPower(50);
         terrariumSettings.setHumidityLevel(50);
