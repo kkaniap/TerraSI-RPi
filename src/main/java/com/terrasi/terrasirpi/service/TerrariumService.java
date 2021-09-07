@@ -69,9 +69,13 @@ public class TerrariumService {
     }
 
     private void setSettings(TerrariumSettings newTerrariumSettings) {
-        if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
+        if(!newTerrariumSettings.getIsBulbWorking()){
+            newTerrariumSettings.setLightPower(0);
+            sendDataToArduino(newTerrariumSettings);
+        }else if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
             sendDataToArduino(newTerrariumSettings);
         }
+
         if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
             turnOnOffHumidifier(newTerrariumSettings.getIsHumidifierWorking());
         }
