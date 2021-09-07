@@ -4,16 +4,18 @@ import com.terrasi.terrasirpi.enums.ScriptName;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
+@Component
 public class PythonUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PythonUtils.class);
+    private final Logger LOG = LoggerFactory.getLogger(PythonUtils.class);
 
-    public static String runScript(InputStream script) {
+    public String runScript(InputStream script) {
         File file = createTempFile(script);
         Process process = null;
         String result = "";
@@ -39,12 +41,12 @@ public class PythonUtils {
         return result;
     }
 
-    public static InputStream getScript(ScriptName scriptName) {
+    public InputStream getScript(ScriptName scriptName) {
         return PythonUtils.class.getClassLoader()
                 .getResourceAsStream(scriptName.getFileName());
     }
 
-    private static File createTempFile(InputStream script) {
+    private File createTempFile(InputStream script) {
         File tmpFile = null;
         try {
             tmpFile = File.createTempFile("pythonScript", ".py");
@@ -57,7 +59,7 @@ public class PythonUtils {
         return tmpFile;
     }
 
-    private static Boolean deleteTempFile(File file) {
+    private Boolean deleteTempFile(File file) {
         return file.delete();
     }
 }

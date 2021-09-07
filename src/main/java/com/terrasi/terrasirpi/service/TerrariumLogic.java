@@ -1,5 +1,6 @@
 package com.terrasi.terrasirpi.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -26,11 +28,15 @@ public class TerrariumLogic {
         if (terrariumSettings != null && terrariumSettings.getAutoManagement()) {
             runAutoManagement();
         }
-        terrariumService.sendSensorRead(sensorsReads);
+        try {
+            terrariumService.sendSensorRead(sensorsReads);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void readSensors() {
-        Map<String, Double> dthMap = terrariumService.readDTH();
+        HashMap<String, Double> dthMap = terrariumService.readDTH();
         sensorsReads.setHumidity(dthMap.get("humidity"));
         sensorsReads.setTemperature(dthMap.get("temp"));
         sensorsReads.setIsOpen(terrariumService.isTerrariumOpen());

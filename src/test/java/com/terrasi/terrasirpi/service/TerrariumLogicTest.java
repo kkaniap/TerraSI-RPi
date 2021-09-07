@@ -27,11 +27,11 @@ class TerrariumLogicTest {
     @Test
     void shouldExecuteLogic() {
         //given
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(prepareDTHData());
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
         SensorsReads sensorsReads = TerrariumLogic.getSensorsReads();
 
         //then
@@ -44,14 +44,14 @@ class TerrariumLogicTest {
     @Test
     void shouldExecuteLogicWithToLowHumidity() {
         //given
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(prepareDTHData());
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
 
         //then
         assertEquals(true, terrariumSettings.getIsHumidifierWorking());
@@ -62,15 +62,15 @@ class TerrariumLogicTest {
         //given
         HashMap<String, Double> dthReads = prepareDTHData();
         dthReads.replace("humidity", 80.0);
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(dthReads);
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(dthReads);
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setIsHumidifierWorking(true);
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
 
         //then
         assertEquals(false, terrariumSettings.getIsHumidifierWorking());
@@ -79,8 +79,8 @@ class TerrariumLogicTest {
     @Test
     void shouldExecuteLogicSunrise() {
         //given
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(prepareDTHData());
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(5);
@@ -90,7 +90,7 @@ class TerrariumLogicTest {
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
 
         //then
         assertEquals(5, terrariumSettings.getLightPower());
@@ -99,8 +99,8 @@ class TerrariumLogicTest {
     @Test
     void shouldExecuteLogicSunriseWithoutSunSpeed() {
         //given
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(prepareDTHData());
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(0);
@@ -110,7 +110,7 @@ class TerrariumLogicTest {
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
 
         //then
         assertEquals(100, terrariumSettings.getLightPower());
@@ -119,8 +119,8 @@ class TerrariumLogicTest {
     @Test
     void shouldExecuteLogicSunset() {
         //given
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(prepareDTHData());
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(5);
@@ -130,7 +130,7 @@ class TerrariumLogicTest {
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
 
         //then
         assertEquals(95, terrariumSettings.getLightPower());
@@ -139,8 +139,8 @@ class TerrariumLogicTest {
     @Test
     void shouldExecuteLogicSunsetWithoutSunSpeed() {
         //given
-        given(terrariumService.isTerrariumOpen()).willReturn(true);
-        given(terrariumService.readDTH()).willReturn(prepareDTHData());
+        given(this.terrariumService.isTerrariumOpen()).willReturn(true);
+        given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(0);
@@ -150,7 +150,7 @@ class TerrariumLogicTest {
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
-        terrariumLogic.executeLogic();
+        this.terrariumLogic.executeLogic();
 
         //then
         assertEquals(0, terrariumSettings.getLightPower());

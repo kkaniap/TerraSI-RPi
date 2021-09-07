@@ -25,25 +25,26 @@ public class TerrariumService {
     @Value("${terrasirpi.rabbitmq.sensorsQueue.name}")
     private String sensorsQueueName;
     private final RabbitAdmin rabbitAdmin;
+    private final PythonUtils pythonUtils;
     private final ObjectMapper objectMapper;
     private final RabbitTemplate rabbitTemplate;
     private static TerrariumSettings terrariumSettings;
     private static final Logger LOG = LoggerFactory.getLogger(TerrariumService.class);
 
-    public TerrariumService(ObjectMapper objectMapper, RabbitTemplate rabbitTemplate) {
+    public TerrariumService(ObjectMapper objectMapper, RabbitTemplate rabbitTemplate, PythonUtils pythonUtils) {
         this.objectMapper = objectMapper;
         this.rabbitTemplate = rabbitTemplate;
         this.rabbitAdmin = new RabbitAdmin(rabbitTemplate);
+        this.pythonUtils = pythonUtils;
     }
 
     @RabbitListener(queues = "${terrasirpi.rabbitmq.settingQueue.name}")
-    public void getTerrariumSettings(Message message) {
+    public void terrariumSettingsListener(Message message) {
         TerrariumSettings receivedTerrariumSettings = null;
 
         try {
             receivedTerrariumSettings = this.objectMapper.readValue(message.getBody(), TerrariumSettings.class);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
 
@@ -57,8 +58,7 @@ public class TerrariumService {
     private void handleNewSettings(TerrariumSettings newTerrariumSettings) {
         if (terrariumSettings == null && !newTerrariumSettings.getAutoManagement()) {
             firstRun(newTerrariumSettings);
-        }
-        else if (!newTerrariumSettings.getAutoManagement()) {
+        } else if (!newTerrariumSettings.getAutoManagement()) {
             setSettings(newTerrariumSettings);
         }
     }
@@ -72,7 +72,7 @@ public class TerrariumService {
         if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
             sendDataToArduino(newTerrariumSettings);
         }
-        else if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
+        if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
             turnOnOffHumidifier(newTerrariumSettings.getIsHumidifierWorking());
         }
     }
@@ -84,42 +84,35 @@ public class TerrariumService {
 
     public void turnOnOffHumidifier(Boolean turnOn) {
         if (turnOn) {
-            PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOn));
-        }
-        else {
-            PythonUtils.runScript(PythonUtils.getScript(ScriptName.HumidifierOff));
+            this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.HumidifierOn));
+        } else {
+            this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.HumidifierOff));
         }
     }
 
     public Boolean isTerrariumOpen() {
-        String result = PythonUtils.runScript(PythonUtils.getScript(ScriptName.IsOpen));
+        String result = this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.IsOpen));
         HashMap<String, Boolean> resultMap = deserializeJSON(result, new TypeReference<>() {
         });
         return resultMap.get("isOpen");
     }
 
     public HashMap<String, Double> readDTH() {
-        String result = PythonUtils.runScript(PythonUtils.getScript(ScriptName.ReadDTH));
+        String result = this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.ReadDTH));
         return deserializeJSON(result, new TypeReference<>() {
         });
     }
 
-    public void sendSensorRead(SensorsReads sensorsReads) {
+    public void sendSensorRead(SensorsReads sensorsReads) throws JsonProcessingException{
         rabbitAdmin.purgeQueue(sensorsQueueName);
-        try {
-            rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
-        }
-        catch (JsonProcessingException e) {
-            LOG.error(e.getMessage());
-        }
+        rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
     }
 
-    private <T> HashMap<String, T> deserializeJSON(String json, TypeReference<HashMap<String, T>> type) {
+    public <T> HashMap<String, T> deserializeJSON(String json, TypeReference<HashMap<String, T>> type) {
         HashMap<String, T> resultMap = new HashMap<>();
         try {
             resultMap = this.objectMapper.readValue(json, type);
-        }
-        catch (JsonProcessingException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
         return resultMap;
