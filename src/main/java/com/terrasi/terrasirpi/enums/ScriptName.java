@@ -4,7 +4,9 @@ public enum ScriptName {
     HumidifierOff("humidifierOff.py"),
     HumidifierOn("humidifierOn.py"),
     IsOpen("isOpen.py"),
-    ReadDTH("readDTH.py");
+    ReadDTH("readDTH.py"),
+    BulbON("bulbOn.py"),
+    BulbOff("bulbOff.py");
 
     private final String fileName;
 
