@@ -54,11 +54,11 @@ public class TerrariumLogic {
     private void handleHumidity() {
         if (sensorsReads.getHumidity() < terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(true);
-            terrariumSettings.setIsHumidifierWorking(true);
+            currentSettings.setIsHumidifierWorking(true);
         }
         else if (sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(false);
-            terrariumSettings.setIsHumidifierWorking(false);
+            currentSettings.setIsHumidifierWorking(false);
         }
     }
 
@@ -80,7 +80,7 @@ public class TerrariumLogic {
         else if (terrariumSettings.getSunSpeed() != 0
                 && terrariumSettings.getSunsetTime().isAfter(LocalTime.now())
                 && terrariumSettings.getSunriseTime().isBefore(LocalTime.now())){
-            currentSettings.setLightPower(Math.max((currentSettings.getLightPower() - currentSettings.getSunSpeed()), 0));
+            currentSettings.setLightPower(Math.max((currentSettings.getLightPower() - terrariumSettings.getSunSpeed()), 0));
             terrariumService.sendDataToArduino(currentSettings);
             if(currentSettings.getLightPower().equals(terrariumSettings.getLightPower())){
                 pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbOff));
@@ -89,7 +89,7 @@ public class TerrariumLogic {
         else if(terrariumSettings.getSunSpeed() != 0
                 && terrariumSettings.getSunriseTime().isAfter(LocalTime.now())
                 && terrariumSettings.getSunsetTime().isBefore(LocalTime.now())){
-            currentSettings.setLightPower(Math.min((currentSettings.getLightPower() + currentSettings.getSunSpeed()), terrariumSettings.getLightPower()));
+            currentSettings.setLightPower(Math.min((currentSettings.getLightPower() + terrariumSettings.getSunSpeed()), terrariumSettings.getLightPower()));
             terrariumService.sendDataToArduino(currentSettings);
             if(currentSettings.getLightPower().equals(terrariumSettings.getLightPower())){
                 pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbON));
@@ -103,7 +103,9 @@ public class TerrariumLogic {
 
     public static void setSettings(TerrariumSettings settings) {
         terrariumSettings = settings;
-        currentSettings = settings;
+        currentSettings = new TerrariumSettings();
+        currentSettings.setLightPower(terrariumSettings.getLightPower());
+        currentSettings.setSunSpeed(terrariumSettings.getSunSpeed());
     }
 
     public static SensorsReads getSensorsReads(){

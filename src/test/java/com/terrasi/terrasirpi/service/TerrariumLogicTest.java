@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -54,7 +55,7 @@ class TerrariumLogicTest {
         this.terrariumLogic.executeLogic();
 
         //then
-        assertEquals(true, terrariumSettings.getIsHumidifierWorking());
+        assertEquals(true, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getIsHumidifierWorking());
     }
 
     @Test
@@ -73,7 +74,7 @@ class TerrariumLogicTest {
         this.terrariumLogic.executeLogic();
 
         //then
-        assertEquals(false, terrariumSettings.getIsHumidifierWorking());
+        assertEquals(false, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getIsHumidifierWorking());
     }
 
     @Test
@@ -84,16 +85,19 @@ class TerrariumLogicTest {
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(5);
-        terrariumSettings.setLightPower(0);
+        terrariumSettings.setLightPower(50);
         terrariumSettings.setSunriseTime(LocalTime.now().plusHours(1));
         terrariumSettings.setSunsetTime(LocalTime.now().minusHours(1));
         TerrariumLogic.setSettings(terrariumSettings);
+        TerrariumSettings currentSettings = prepareTerrariumSetting();
+        currentSettings.setLightPower(0);
+        ReflectionTestUtils.setField(this.terrariumLogic, "currentSettings", currentSettings);
 
         //when
         this.terrariumLogic.executeLogic();
 
         //then
-        assertEquals(5, terrariumSettings.getLightPower());
+        assertEquals(5, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getLightPower());
     }
 
     @Test
@@ -104,7 +108,7 @@ class TerrariumLogicTest {
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(0);
-        terrariumSettings.setLightPower(5);
+        terrariumSettings.setLightPower(75);
         terrariumSettings.setSunriseTime(LocalTime.now().plusHours(1));
         terrariumSettings.setSunsetTime(LocalTime.now().minusHours(1));
         TerrariumLogic.setSettings(terrariumSettings);
@@ -113,7 +117,7 @@ class TerrariumLogicTest {
         this.terrariumLogic.executeLogic();
 
         //then
-        assertEquals(100, terrariumSettings.getLightPower());
+        assertEquals(75, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getLightPower());
     }
 
     @Test
@@ -133,7 +137,7 @@ class TerrariumLogicTest {
         this.terrariumLogic.executeLogic();
 
         //then
-        assertEquals(95, terrariumSettings.getLightPower());
+        assertEquals(95, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getLightPower());
     }
 
     @Test
@@ -153,7 +157,7 @@ class TerrariumLogicTest {
         this.terrariumLogic.executeLogic();
 
         //then
-        assertEquals(0, terrariumSettings.getLightPower());
+        assertEquals(0, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getLightPower());
     }
 
     @Test

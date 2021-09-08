@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 
-humidifierRelay = 12
+bulbRelay = 12
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
