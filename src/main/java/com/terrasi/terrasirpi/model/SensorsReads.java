@@ -16,9 +16,8 @@ public class SensorsReads {
     private Long id;
     private Double temperature;
     private Double humidity;
-    private Integer brightness;
-    private Integer uvaLevel;
-    private Integer uvbLevel;
+    private Double uvaLevel;
+    private Double uvbLevel;
     private Integer waterLevel;
     private Boolean isOpen;
 

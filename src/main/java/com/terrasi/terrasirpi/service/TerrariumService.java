@@ -107,6 +107,12 @@ public class TerrariumService {
         });
     }
 
+    public HashMap<String, Double> readUV(){
+        String result = this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.ReadUV));
+        return deserializeJSON(result, new TypeReference<>() {
+        });
+    }
+
     public void sendSensorRead(SensorsReads sensorsReads) throws JsonProcessingException{
         rabbitAdmin.purgeQueue(sensorsQueueName);
         rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));

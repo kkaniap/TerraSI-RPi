@@ -6,7 +6,8 @@ public enum ScriptName {
     IsOpen("isOpen.py"),
     ReadDTH("readDTH.py"),
     BulbON("bulbOn.py"),
-    BulbOff("bulbOff.py");
+    BulbOff("bulbOff.py"),
+    ReadUV("readUV.py");
 
     private final String fileName;
 

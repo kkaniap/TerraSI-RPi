@@ -40,10 +40,13 @@ public class TerrariumLogic {
 
     private void readSensors() {
         HashMap<String, Double> dthMap = terrariumService.readDTH();
+        HashMap<String, Double> uvMap = terrariumService.readUV();
         sensorsReads.setHumidity(dthMap.get("humidity"));
         sensorsReads.setTemperature(dthMap.get("temp"));
         sensorsReads.setIsOpen(terrariumService.isTerrariumOpen());
         sensorsReads.setReadDate(LocalDateTime.now());
+        sensorsReads.setUvaLevel(uvMap.get("uva"));
+        sensorsReads.setUvbLevel(uvMap.get("uvb"));
     }
 
     private void runAutoManagement() {
