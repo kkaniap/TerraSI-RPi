@@ -100,10 +100,6 @@ public class TerrariumLogic {
         }
     }
 
-    public static void setWaterLevel(Integer waterLevel) {
-        sensorsReads.setWaterLevel(waterLevel);
-    }
-
     public static void setSettings(TerrariumSettings settings) {
         terrariumSettings = settings;
         currentSettings = new TerrariumSettings();

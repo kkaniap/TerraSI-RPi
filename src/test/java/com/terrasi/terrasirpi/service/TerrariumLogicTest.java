@@ -160,15 +160,6 @@ class TerrariumLogicTest {
         assertEquals(0, ((TerrariumSettings) ReflectionTestUtils.getField(this.terrariumLogic, "currentSettings")).getLightPower());
     }
 
-    @Test
-    void shouldSetTerrariumSettings() {
-        //given
-        TerrariumLogic.setWaterLevel(50);
-
-        //then
-        assertEquals(50, TerrariumLogic.getSensorsReads().getWaterLevel());
-    }
-
     private HashMap<String, Double> prepareDTHData() {
         HashMap<String, Double> dthMap = new HashMap<>();
         dthMap.put("humidity", 20.0);
