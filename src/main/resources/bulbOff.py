@@ -4,5 +4,8 @@ bulbRelay = 12
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(humidifierRelay, GPIO.OUT)
-GPIO.output(humidifierRelay, GPIO.HIGH)
+GPIO.setup(bulbRelay, GPIO.OUT)
+GPIO.output(bulbRelay, GPIO.LOW)
+GPIO.cleanup(humidifierRelay)
+
+

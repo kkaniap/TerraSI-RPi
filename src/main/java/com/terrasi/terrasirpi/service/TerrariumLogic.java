@@ -85,9 +85,8 @@ public class TerrariumLogic {
                 && terrariumSettings.getSunriseTime().isBefore(LocalTime.now())){
             currentSettings.setLightPower(Math.max((currentSettings.getLightPower() - terrariumSettings.getSunSpeed()), 0));
             terrariumService.sendDataToArduino(currentSettings);
-            if(currentSettings.getLightPower().equals(terrariumSettings.getLightPower())){
-                pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbOff));
-            }
+            pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbOff));
+
         }
         else if(terrariumSettings.getSunSpeed() != 0
                 && terrariumSettings.getSunriseTime().isAfter(LocalTime.now())

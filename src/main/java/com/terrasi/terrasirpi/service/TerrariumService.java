@@ -64,16 +64,26 @@ public class TerrariumService {
     }
 
     private void firstRun(TerrariumSettings newTerrariumSettings) {
+        if(!newTerrariumSettings.getIsBulbWorking()){
+            newTerrariumSettings.setLightPower(0);
+            this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbOff));
+        }
+        else {
+            this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbON));
+        }
         sendDataToArduino(newTerrariumSettings);
         turnOnOffHumidifier(newTerrariumSettings.getIsHumidifierWorking());
+
     }
 
     private void setSettings(TerrariumSettings newTerrariumSettings) {
         if(!newTerrariumSettings.getIsBulbWorking()){
             newTerrariumSettings.setLightPower(0);
             sendDataToArduino(newTerrariumSettings);
+            this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbOff));
         }else if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
             sendDataToArduino(newTerrariumSettings);
+            this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbON));
         }
 
         if (!terrariumSettings.getIsHumidifierWorking().equals(newTerrariumSettings.getIsHumidifierWorking())) {
