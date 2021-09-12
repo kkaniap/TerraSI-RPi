@@ -2,6 +2,8 @@ package com.terrasi.terrasirpi.service;
 
 import com.terrasi.terrasirpi.model.SensorsReads;
 import com.terrasi.terrasirpi.model.TerrariumSettings;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,11 +27,17 @@ class TerrariumLogicTest {
     @InjectMocks
     TerrariumLogic terrariumLogic;
 
+    @BeforeEach
+    void beforeEachTest() {
+        ReflectionTestUtils.setField(this.terrariumLogic, "currentSettings", null);
+    }
+
     @Test
     void shouldExecuteLogic() {
         //given
         given(this.terrariumService.isTerrariumOpen()).willReturn(true);
         given(this.terrariumService.readDTH()).willReturn(prepareDTHData());
+        TerrariumLogic.setSettings(prepareTerrariumSetting());
 
         //when
         this.terrariumLogic.executeLogic();
@@ -85,9 +93,8 @@ class TerrariumLogicTest {
         TerrariumSettings terrariumSettings = prepareTerrariumSetting();
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(5);
-        terrariumSettings.setLightPower(50);
-        terrariumSettings.setSunriseTime(LocalTime.now().plusHours(1));
-        terrariumSettings.setSunsetTime(LocalTime.now().minusHours(1));
+        terrariumSettings.setSunriseTime(LocalTime.now().minusHours(1));
+        terrariumSettings.setSunsetTime(LocalTime.now().plusHours(5));
         TerrariumLogic.setSettings(terrariumSettings);
         TerrariumSettings currentSettings = prepareTerrariumSetting();
         currentSettings.setLightPower(0);
@@ -109,8 +116,8 @@ class TerrariumLogicTest {
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(0);
         terrariumSettings.setLightPower(75);
-        terrariumSettings.setSunriseTime(LocalTime.now().plusHours(1));
-        terrariumSettings.setSunsetTime(LocalTime.now().minusHours(1));
+        terrariumSettings.setSunriseTime(LocalTime.now().minusHours(1));
+        terrariumSettings.setSunsetTime(LocalTime.now().plusHours(5));
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
@@ -129,8 +136,7 @@ class TerrariumLogicTest {
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(5);
         terrariumSettings.setLightPower(100);
-        terrariumSettings.setSunriseTime(LocalTime.now().minusHours(1));
-        terrariumSettings.setSunsetTime(LocalTime.now().plusHours(1));
+        terrariumSettings.setSunsetTime(LocalTime.now().minusHours(1));
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
@@ -149,8 +155,7 @@ class TerrariumLogicTest {
         terrariumSettings.setAutoManagement(true);
         terrariumSettings.setSunSpeed(0);
         terrariumSettings.setLightPower(100);
-        terrariumSettings.setSunriseTime(LocalTime.now().minusHours(1));
-        terrariumSettings.setSunsetTime(LocalTime.now().plusHours(1));
+        terrariumSettings.setSunsetTime(LocalTime.now().minusHours(1));
         TerrariumLogic.setSettings(terrariumSettings);
 
         //when
