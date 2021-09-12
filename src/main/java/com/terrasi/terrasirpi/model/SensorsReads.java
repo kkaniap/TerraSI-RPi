@@ -18,7 +18,7 @@ public class SensorsReads {
     private Double humidity;
     private Double uvaLevel;
     private Double uvbLevel;
-    private Integer waterLevel;
+    private Double waterLevel;
     private Boolean isOpen;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)

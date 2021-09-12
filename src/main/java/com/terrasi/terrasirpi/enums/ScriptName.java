@@ -7,7 +7,8 @@ public enum ScriptName {
     ReadDTH("readDTH.py"),
     BulbON("bulbOn.py"),
     BulbOff("bulbOff.py"),
-    ReadUV("readUV.py");
+    ReadUV("readUV.py"),
+    WaterLevel("waterLevel.py");
 
     private final String fileName;
 

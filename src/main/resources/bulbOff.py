@@ -6,6 +6,6 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(bulbRelay, GPIO.OUT)
 GPIO.output(bulbRelay, GPIO.LOW)
-GPIO.cleanup(humidifierRelay)
+GPIO.cleanup(bulbRelay)
 
 

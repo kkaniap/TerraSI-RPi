@@ -123,6 +123,13 @@ public class TerrariumService {
         });
     }
 
+    public Double getWaterLevel(){
+        String result = this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.WaterLevel));
+        HashMap<String, Double> resultMap = deserializeJSON(result, new TypeReference<>() {
+        });
+        return resultMap.get("waterLevel");
+    }
+
     public void sendSensorRead(SensorsReads sensorsReads) throws JsonProcessingException{
         rabbitAdmin.purgeQueue(sensorsQueueName);
         rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));

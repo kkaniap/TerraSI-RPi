@@ -48,6 +48,7 @@ public class TerrariumLogic {
         sensorsReads.setReadDate(LocalDateTime.now());
         sensorsReads.setUvaLevel(uvMap.get("uva"));
         sensorsReads.setUvbLevel(uvMap.get("uvb"));
+        sensorsReads.setWaterLevel(terrariumService.getWaterLevel());
     }
 
     private void runAutoManagement() {
