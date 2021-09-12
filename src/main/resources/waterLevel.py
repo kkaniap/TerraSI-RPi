@@ -16,12 +16,10 @@ bus = smbus.SMBus(i2c_ch)
 
 def getHigh12SectionValue():
     high_data = bus.read_i2c_block_data(ATTINY1_HIGH_ADDR, reg_config, 12)
-    print(high_data)
     return high_data
 
 def getLow8SectionValue():
     low_data = bus.read_i2c_block_data(ATTINY2_LOW_ADDR, reg_config, 8)
-    print(low_data)
     return low_data
 
 def check_water_level():
