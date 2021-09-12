@@ -46,7 +46,6 @@ public class UsbUtils{
 
     public void sendData(TerrariumSettings terrariumSettings) {
         try {
-            System.out.println(objectMapper.writeValueAsString(terrariumSettings));
             if (serialPort.isOpen()) {
                 serialPort.getOutputStream()
                         .write(objectMapper.writeValueAsString(terrariumSettings)

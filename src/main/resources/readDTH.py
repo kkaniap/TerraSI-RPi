@@ -2,8 +2,8 @@ import adafruit_dht
 import board
 import RPi.GPIO as GPIO
 
-DHT_SENSOR_1 = adafruit_dht.DHT11(board.D4)
-DHT_SENSOR_2 = adafruit_dht.DHT11(board.D17)
+DHT_SENSOR_1 = adafruit_dht.DHT11(board.D4, use_pulseio=False)
+DHT_SENSOR_2 = adafruit_dht.DHT11(board.D17, use_pulseio=False)
 
 temp1 = None
 temp2 = None
@@ -16,7 +16,7 @@ try:
     humidity1 = DHT_SENSOR_1.humidity
 except Exception as error_1:
     error = error_1.args[0]
-    
+
 try:
     temp2 = DHT_SENSOR_2.temperature
     humidity2 = DHT_SENSOR_2.humidity
@@ -36,4 +36,7 @@ elif humidity1 != None and humidity2 == None: avgHumidity = humidity1
 
 print("{\"temp\":" + str(avgTemp) + ",\"humidity\":" + str(avgHumidity) + "}")
 
+DHT_SENSOR_1.exit()
+DHT_SENSOR_2.exit()
 GPIO.cleanup()
+
