@@ -64,11 +64,10 @@ public class TerrariumService {
     }
 
     private void firstRun(TerrariumSettings newTerrariumSettings) {
-        if(!newTerrariumSettings.getIsBulbWorking()){
+        if (!newTerrariumSettings.getIsBulbWorking()) {
             newTerrariumSettings.setLightPower(0);
             this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbOff));
-        }
-        else {
+        } else {
             this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbON));
         }
         sendDataToArduino(newTerrariumSettings);
@@ -77,11 +76,11 @@ public class TerrariumService {
     }
 
     private void setSettings(TerrariumSettings newTerrariumSettings) {
-        if(!newTerrariumSettings.getIsBulbWorking()){
+        if (!newTerrariumSettings.getIsBulbWorking()) {
             newTerrariumSettings.setLightPower(0);
             sendDataToArduino(newTerrariumSettings);
             this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbOff));
-        }else if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
+        } else if (!terrariumSettings.getLightPower().equals(newTerrariumSettings.getLightPower())) {
             sendDataToArduino(newTerrariumSettings);
             this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.BulbON));
         }
@@ -117,20 +116,20 @@ public class TerrariumService {
         });
     }
 
-    public HashMap<String, Double> readUV(){
+    public HashMap<String, Double> readUV() {
         String result = this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.ReadUV));
         return deserializeJSON(result, new TypeReference<>() {
         });
     }
 
-    public Double getWaterLevel(){
+    public Double readWaterLevel() {
         String result = this.pythonUtils.runScript(this.pythonUtils.getScript(ScriptName.WaterLevel));
         HashMap<String, Double> resultMap = deserializeJSON(result, new TypeReference<>() {
         });
         return resultMap.get("waterLevel");
     }
 
-    public void sendSensorRead(SensorsReads sensorsReads) throws JsonProcessingException{
+    public void sendSensorRead(SensorsReads sensorsReads) throws JsonProcessingException {
         rabbitAdmin.purgeQueue(sensorsQueueName);
         rabbitTemplate.convertAndSend(sensorsQueueName, objectMapper.writeValueAsString(sensorsReads));
     }

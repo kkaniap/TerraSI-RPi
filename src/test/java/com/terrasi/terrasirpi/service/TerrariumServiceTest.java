@@ -75,6 +75,30 @@ public class TerrariumServiceTest {
     }
 
     @Test
+    void shouldReturnUV(){
+        //given
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("uva", 50.0);
+        resultMap.put("uvb", 40.0);
+        given(this.terrariumService.deserializeJSON(any(), any())).willReturn(resultMap);
+
+        //then
+        assertEquals(50.0, this.terrariumService.readUV().get("uva"));
+        assertEquals(40.0, this.terrariumService.readUV().get("uvb"));
+    }
+
+    @Test
+    void shouldReturnWaterLevel(){
+        //given
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("waterLevel", 50.0);
+        given(this.terrariumService.deserializeJSON(any(), any())).willReturn(resultMap);
+
+        //then
+        assertEquals(50.0, this.terrariumService.readWaterLevel());
+    }
+
+    @Test
     void shouldTurnOffHumidifier() {
         assertDoesNotThrow(() -> this.terrariumService.turnOnOffHumidifier(false));
     }

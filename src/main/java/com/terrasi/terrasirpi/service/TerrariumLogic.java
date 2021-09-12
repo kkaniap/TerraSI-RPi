@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
-import java.util.Objects;
 
 @Service
 public class TerrariumLogic {
@@ -48,7 +47,7 @@ public class TerrariumLogic {
         sensorsReads.setReadDate(LocalDateTime.now());
         sensorsReads.setUvaLevel(uvMap.get("uva"));
         sensorsReads.setUvbLevel(uvMap.get("uvb"));
-        sensorsReads.setWaterLevel(terrariumService.getWaterLevel());
+        sensorsReads.setWaterLevel(terrariumService.readWaterLevel());
     }
 
     private void runAutoManagement() {
@@ -60,8 +59,7 @@ public class TerrariumLogic {
         if (sensorsReads.getHumidity() < terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(true);
             currentSettings.setIsHumidifierWorking(true);
-        }
-        else if (sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()) {
+        } else if (sensorsReads.getHumidity() > terrariumSettings.getHumidityLevel()) {
             terrariumService.turnOnOffHumidifier(false);
             currentSettings.setIsHumidifierWorking(false);
         }
@@ -73,27 +71,24 @@ public class TerrariumLogic {
             currentSettings.setLightPower(0);
             terrariumService.sendDataToArduino(currentSettings);
             pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbOff));
-        }
-        else if(terrariumSettings.getSunSpeed() == 0
+        } else if (terrariumSettings.getSunSpeed() == 0
                 && LocalTime.now().isAfter(terrariumSettings.getSunriseTime())
                 && LocalTime.now().isBefore(terrariumSettings.getSunsetTime())) {
             currentSettings.setLightPower(terrariumSettings.getLightPower());
             terrariumService.sendDataToArduino(currentSettings);
             pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbON));
-        }
-        else if (terrariumSettings.getSunSpeed() != 0
-                && LocalTime.now().isAfter(terrariumSettings.getSunsetTime())){
+        } else if (terrariumSettings.getSunSpeed() != 0
+                && LocalTime.now().isAfter(terrariumSettings.getSunsetTime())) {
             currentSettings.setLightPower(Math.max((currentSettings.getLightPower() - terrariumSettings.getSunSpeed()), 0));
             terrariumService.sendDataToArduino(currentSettings);
             pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbOff));
 
-        }
-        else if(terrariumSettings.getSunSpeed() != 0
+        } else if (terrariumSettings.getSunSpeed() != 0
                 && LocalTime.now().isAfter(terrariumSettings.getSunriseTime())
-                && LocalTime.now().isBefore(terrariumSettings.getSunsetTime())){
+                && LocalTime.now().isBefore(terrariumSettings.getSunsetTime())) {
             currentSettings.setLightPower(Math.min((currentSettings.getLightPower() + terrariumSettings.getSunSpeed()), terrariumSettings.getLightPower()));
             terrariumService.sendDataToArduino(currentSettings);
-            if(currentSettings.getLightPower().equals(terrariumSettings.getLightPower())){
+            if (currentSettings.getLightPower().equals(terrariumSettings.getLightPower())) {
                 pythonUtils.runScript(pythonUtils.getScript(ScriptName.BulbON));
             }
         }
@@ -101,14 +96,14 @@ public class TerrariumLogic {
 
     public static void setSettings(TerrariumSettings settings) {
         terrariumSettings = settings;
-        if(currentSettings == null) {
+        if (currentSettings == null) {
             currentSettings = new TerrariumSettings();
             currentSettings.setLightPower(terrariumSettings.getLightPower());
             currentSettings.setSunSpeed(terrariumSettings.getSunSpeed());
         }
     }
 
-    public static SensorsReads getSensorsReads(){
+    public static SensorsReads getSensorsReads() {
         return sensorsReads;
     }
 }
